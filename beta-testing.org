@@ -1,0 +1,40 @@
+#+title: Beta-testing
+
+* Preparation
+- Call ~M-: (willdo-naggins--prepare)~
+  - This creates =$XDG_DATA_HOME/willdo-naggins= and creates/opens =db.sqlite=
+    inside
+* What to test and look out for
+- Call ~willdo-naggins-learn~ to create a nag for the current headline
+- Call ~willdo-naggins-query-single~ to interact with current nags
+  - Once you have nags, a childframe should show up. Configure its background
+    color with ~willdo-naggins-win-background-color~.
+  - Edit stuff, snooze, call the query function again, etc.
+  - Default nag snooze is 1 hour. Configurable with
+    ~willdo-naggins-snooze-duration-hours~.
+  - Currently, there's no way to "unsnooze" a nag. Wait for the expiration and
+    it will show up again.
+  - Currently, there's no way to "unforget" a nag. It is still in the db, but WN
+    won't list it. You need to edit the db manually.
+- Call ~willdo-naggins-suggest-single~ to scan and interact with "suggestions"
+  - Suggestions are, for now, headlines with SCHEDULED or DEADLINE from ~(org-agenda-files)~
+  - These are candidate nags that you can either have WN "learn" or "ignore"
+    - Ignoring adds a tag to the headline. Configurable with ~willdo-naggins--suggest-ignore-tag~.
+* Information on internals
+- The preparation step should be harmless
+  - Just mentioning in case you call it multiple times
+- "Learning" is (mostly) harmless
+  - WN's DB is basically a list of org-ids (which WN creates)
+  - WN assigns an org-id to the headline if it doesn't have one
+    - This is the only editing during acquisition
+- There is a _very_ simple undo action for edits inside the query function
+  - It only calls ~undo-only~, nothing WN-specific
+  - Mostly to avoid mistaken key presses, don't rely on it for larger things or
+    for out-of-order operations (e.g., after calling next/prev and editing
+    something else)
+- WN adds two timers:
+  - one for maintaining the snooze function (every 5 mins, configurable)
+  - another for the tooltip (every 5 mins, schedule a tooltip if you're idle for 30s)
+- In the WN db, nags are just a list of org-ids
+  - Each org-id has a "snooze until" timestamp and a "forget" flag
+  - WN clears the snooze-until field if the maintenance function runs after that timestamp
