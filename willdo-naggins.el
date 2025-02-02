@@ -250,6 +250,7 @@ Nil, zero or negative values disable periodic checking.")
   (display-line-numbers-mode -1) ; no line numbers (no way to do this from display parameters?)
   (goto-char mkr)                ; go to node
   (org-narrow-to-element)        ; narrow
+  (org-show-entry)
   )
 
 (defun willdo-naggins--close-popups ()
